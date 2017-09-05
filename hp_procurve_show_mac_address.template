@@ -1,5 +1,5 @@
 Value MAC ([0-9a-fA-F]{6}-[0-9a-fA-F]{6})
-Value PORT (\d+)
+Value PORT (\w+)
 Value VLAN (\d+)
 
 Start
