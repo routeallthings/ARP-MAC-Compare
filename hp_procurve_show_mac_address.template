@@ -1,6 +1,6 @@
 Value MAC ([0-9a-fA-F]{6}-[0-9a-fA-F]{6})
 Value PORT (\d+)
-Value PORT (\d+)
+Value VLAN (\d+)
 
 Start
   ^.*Port Address Table -> MAC
