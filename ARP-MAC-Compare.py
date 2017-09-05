@@ -87,6 +87,7 @@ if not re.match("hp",sshl2type) and not re.match("cisco",sshl2type):
 	print 'Incorrect input, please enter one of the compatible switch OS'
 	sys.exit()
 sshl2l3q = raw_input ('Is the L3 boundary on the same switch? (Y/N): ')
+l2uplinkq = raw_input ('Do you want to ignore interfaces with more than 3 MAC addresses? (Y/N): ')
 if "N" in sshl2l3q.upper():
 	print '----Questions for the L3 switch----'
 	sshl3ipq = raw_input ('Please enter the IP address of the L3 switch(s) (Separate by a comma): ')
@@ -158,10 +159,55 @@ for sshl2ip in sshl2ipq:
 	if 'cisco' in sshl2type:
 		l2mactable = l2net_connect.send_command("show mac address-table dynamic")
 		if 'Invalid input' in l2mactable:
-			l2net_connect.send_command("show mac-address-table")
+			l2mactable = l2net_connect.send_command("show mac-address-table")
+		l2mactable = fsmmactemplate.ParseText(l2mactable)
+		if 'Y' in l2uplinkq.upper():
+			for mac in l2mactable:
+				macinterface = mac[3]
+				try:
+					l2macinttablefull.append(macinterface)
+				except NameError:
+					l2macinttablefull = []
+					l2macinttablefull.append(macinterface)
+			for mac in l2mactable:
+				macinterface = mac[3]
+				macinterfacename = macinterface.encode('ascii','ignore')
+				l2macintcount = l2macinttablefull.count(macinterface)
+				if l2macintcount < 3:
+					try:
+						l2mactablenew.append(mac)
+					except NameError:
+						l2mactablenew = []
+						l2mactablenew.append(mac)
+				else:
+					l2macintcountstr = str(l2macintcount)
+					'''print 'Interface ' + macinterfacename + ' has over ' + l2macintcountstr + ' mac addresses associated. Assuming uplink to another switch.'''
+			l2mactable = l2mactablenew
 	if 'hp' in sshl2type:
 		l2mactable = l2net_connect.send_command("show mac-address")
-	l2mactable = fsmmactemplate.ParseText(l2mactable)
+		l2mactable = fsmmactemplate.ParseText(l2mactable)
+		if 'Y' in l2uplinkq.upper():
+			for mac in l2mactable:
+				macinterface = mac[1]
+				try:
+					l2macinttablefull.append(macinterface)
+				except NameError:
+					l2macinttablefull = []
+					l2macinttablefull.append(macinterface)
+			for mac in l2mactable:
+				macinterface = mac[1]
+				macinterfacename = macinterface.encode('ascii','ignore')
+				l2macintcount = l2macinttablefull.count(macinterface)
+				if l2macintcount < 3:
+					try:
+						l2mactablenew.append(mac)
+					except NameError:
+						l2mactablenew = []
+						l2mactablenew.append(mac)
+				else:
+					l2macintcountstr = str(l2macintcount)
+					'''print 'Interface ' + macinterfacename + ' has over ' + l2macintcountstr + ' mac addresses associated. Assuming uplink to another switch.'''
+			l2mactable = l2mactablenew
 	try:
 		l2mactablefull.extend(l2mactable)
 	except NameError:
