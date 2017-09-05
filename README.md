@@ -27,7 +27,8 @@ Just execute the script and answer the questions
 - Export to CSV
 
 ## *Caveats
-- Have not tested HP mac addresses
+- Have not tested HP Comware
+- Only works with groups of the same switches (Layer 2 groups are separate from Layer 3 groups)
 
 ## Versioning
 

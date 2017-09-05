@@ -10,7 +10,7 @@ INSTALL textfsm (pip install textfsm)
 INSTALL urllib (pip install urllib)
 
 ---VERSION---
-VERSION 1.0
+VERSION 1.1
 
 ---THANKS---
 networktocode - FSM templates
@@ -58,7 +58,7 @@ except ImportError:
 		print "You selected an option other than yes. Please be aware that this script requires the use of urllib. Please install manually and retry"
 		sys.exit()
 '''Global Variables'''
-ipv4_address = re.compile('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+ipv4_address = re.compile('((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)')
 
 '''Global Variable Questions'''
 print ''
@@ -68,7 +68,7 @@ print 'The purpose of this is to make sure that all MAC entries '
 print 'on a given switch have an IP associated on a L3 boundary.'
 print '#########################################################'
 print ''
-print 'Questions for the L2 switch'
+print '----Questions for the L2 switch----'
 sshl2ipq = raw_input ('Please enter the IP address of the L2 switch(s) (Separate by a comma): ')
 if not ipv4_address.match(sshl2ipq):
 		sshl2ipq = raw_input ('Please enter a correct IP address: ')
@@ -88,7 +88,7 @@ if not re.match("hp",sshl2type) and not re.match("cisco",sshl2type):
 	sys.exit()
 sshl2l3q = raw_input ('Is the L3 boundary on the same switch? (Y/N): ')
 if "N" in sshl2l3q.upper():
-	print 'Questions for the L3 switch'
+	print '----Questions for the L3 switch----'
 	sshl3ipq = raw_input ('Please enter the IP address of the L3 switch(s) (Separate by a comma): ')
 	if not ipv4_address.match(sshl3ipq):
 		sshl3ipq = raw_input ('Please enter a correct IP address: ')
@@ -98,7 +98,7 @@ if "N" in sshl2l3q.upper():
 	sshl3userq = raw_input ('Enter the SSH username for the L3 switch: ')
 	sshl3password = getpass.getpass('Enter the SSH password for the L3 switch: ')
 	sshl3enable = getpass.getpass('Enter the SSH enable password for the L3 switch (optional): ')
-	sshl3type = raw_input ('Enter the OS of the L3 switch (IOS/XE/NXOS): ')
+	sshl3type = raw_input ('Enter the OS of the L3 switch (IOS/XE/NXOS/Comware/Procurve): ')
 	if 'IOS' in sshl3type.upper() or 'XE' in sshl3type.upper() or 'NXOS' in sshl3type.upper():
 		sshl3type = 'cisco_' + sshl3type.lower()
 	if 'COMWARE' in sshl3type.upper() or 'PROCURVE' in sshl3type.upper():
@@ -116,10 +116,13 @@ else:
 saveresults = raw_input ('Do you want to save the results to a file? (Y/N): ')
 if "Y" in saveresults.upper() or "YES" in saveresults.upper():
 	savepath = raw_input ('Please enter the path of the file? (e.g. C:\Python27\Results.csv): ')
-	
+	if savepath == '':
+		savepath = 'C:\Python27\Results.csv'
 '''FSM section L2'''
-if "hp_comware" in sshl2type or "hp_procurve" in sshl2type:
+if "hp_comware" in sshl2type:
 	fsmmactemplateurl = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/hp_comware_display_mac-address.template"
+if "hp_procurve" in sshl2type:
+	fsmmactemplateurl = "https://raw.githubusercontent.com/routeallthings/ARP-MAC-Compare/master/hp_procurve_show_mac_address.template"
 if "cisco_ios" in sshl2type or "cisco_xe" in sshl2type:
 	fsmmactemplateurl = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/cisco_ios_show_mac-address-table.template"
 if "cisco_nxos" in sshl2type:
@@ -128,13 +131,13 @@ urllib.urlretrieve(fsmmactemplateurl,'fsmmactemplate.fsm')
 fsmmactemplatefile = open("fsmmactemplate.fsm")
 fsmmactemplate = textfsm.TextFSM(fsmmactemplatefile)
 '''FSM section L3'''
-if "hp_comware" in sshl2type:
+if "hp_comware" in sshl3type:
 	fsmarptemplate = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/hp_comware_display_arp.template"
-if "hp_procurve" in sshl2type:
-	fsmarptemplate = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/hp_procurve_show_arp.template"
-if "cisco_ios" in sshl2type or "cisco_xe" in sshl2type:
+if "hp_procurve" in sshl3type:
+	fsmarptemplate = "https://raw.githubusercontent.com/routeallthings/ARP-MAC-Compare/master/hp_procurve_show_arp.template"
+if "cisco_ios" in sshl3type or "cisco_xe" in sshl2type:
 	fsmarptemplate = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/cisco_ios_show_ip_arp.template"
-if "cisco_nxos" in sshl2type:
+if "cisco_nxos" in sshl3type:
 	fsmarptemplate = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/cisco_nxos_show_ip_arp_detail.template"
 urllib.urlretrieve(fsmarptemplate,'fsmarptemplate.fsm')
 fsmarptemplatefile = open("fsmarptemplate.fsm")
@@ -158,13 +161,14 @@ for sshl2ip in sshl2ipq:
 		if 'Invalid input' in l2mactable:
 			l2net_connect.send_command("show mac-address-table")
 	if 'hp' in sshl2type:
-		l2mactable = l2net_connect.send_command("show mac address-table")
+		l2mactable = l2net_connect.send_command("show mac-address")
 	l2mactable = fsmmactemplate.ParseText(l2mactable)
 	try:
 		l2mactablefull.extend(l2mactable)
 	except NameError:
 		l2mactablefull = []
 		l2mactablefull.extend(l2mactable)
+	l2net_connect.disconnect()
 print '---------------------------------------------------------'
 '''L3'''
 print 'Connecting to the L3 switch'
@@ -183,13 +187,14 @@ for sshl3ip in sshl3ipq:
 		if 'Invalid input' in l3arptable:
 			l3net_connect.send_command("show arp")
 	if 'hp' in sshl3type:
-		l3arptable = l3net_connect.send_command("show ip arp")
+		l3arptable = l3net_connect.send_command("show arp")
 	l3arptable = fsmarptemplate.ParseText(l3arptable)
 	try:
 		l3arptablefull.extend(l3arptable)
 	except NameError:
 		l3arptablefull = []
 		l3arptablefull.extend(l3arptable)
+	l3net_connect.disconnect()
 print '---------------------------------------------------------'
 print 'Comparing MAC address table to ARP table'
 if "Y" in saveresults.upper() or "YES" in saveresults.upper():
@@ -197,42 +202,88 @@ if "Y" in saveresults.upper() or "YES" in saveresults.upper():
 		fieldnames = ['mac_add', 'mac_vlan', 'mac_int', 'arp_ip', 'arp_int']
 		writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 		writer.writeheader()
-		for mac in l2mactable:
-			macaddress = mac[0]
-			macvlan = mac[2]
-			macinterface = mac[3]
-			for ipadd in l3arptable:
-				arpmac = ipadd[2]
-				arpip = ipadd[0]
-				arpint = ipadd[4]
+		for mac in l2mactablefull:
+			if 'cisco' in sshl2type:
+				macaddress = mac[0]
+				macvlan = mac[2]
+				macinterface = mac[3]
+			if 'hp' in sshl2type:
+				macaddress = mac[0]
+				macvlan = mac[2]
+				macinterface = mac[1]
+			macaddress = macaddress.encode('ascii','ignore')
+			macaddress = macaddress.replace ('-','')
+			macaddress = macaddress.replace ('.','')
+			for ipadd in l3arptablefull:
+				if 'cisco' in sshl3type:
+					arpmac = ipadd[2]
+					arpip = ipadd[0]
+					arpint = ipadd[4]
+				if 'hp' in sshl3type:
+					arpmac = ipadd[1]
+					arpip = ipadd[0]
+					arpint = ipadd[3]
+				arpmac = arpmac.encode('ascii','ignore')
+				arpmac = arpmac.replace ('-','')
+				arpmac = arpmac.replace ('.','')
 				if macaddress == arpmac:
 					foundmatch = 'true'
 					break
+				else:
+					foundmatch = 'false'
 			if 'true' in foundmatch:
 				print 'Found match on L2 interface ' + macinterface + '. The IP address found was ' + arpip + ' in ' + arpint + '.'
 				writer.writerow({'mac_add': macaddress, 'mac_vlan': macvlan, 'mac_int': macinterface, 'arp_ip': arpip, 'arp_int': arpint})
 			else:
 				print 'No IP address found for MAC ' + macaddress + ' on interface ' + macinterface + ' in vlan' + macvlan + '.'
-				print 'Please validate that this is in the correct VLAN.'
 				writer.writerow({'mac_add': macaddress, 'mac_vlan': macvlan, 'mac_int': macinterface})
 			foundmatch = 'false'
 else:
-	for mac in l2mactable:
-		macaddress = mac[0]
-		macvlan = mac[2]
-		macinterface = mac[3]
-		for ipadd in l3arptable:
-			arpmac = ipadd[2]
-			arpip = ipadd[0]
-			arpint = ipadd[4]
+	for mac in l2mactablefull:
+		if 'cisco' in sshl2type:
+			macaddress = mac[0]
+			macvlan = mac[2]
+			macinterface = mac[3]
+		if 'hp' in sshl2type:
+			macaddress = mac[0]
+			macvlan = mac[2]
+			macinterface = mac[1]
+		macaddress = macaddress.encode('ascii','ignore')
+		macaddress = macaddress.replace ('-','')
+		macaddress = macaddress.replace ('.','')
+		for ipadd in l3arptablefull:
+			if 'cisco' in sshl3type:
+				arpmac = ipadd[2]
+				arpip = ipadd[0]
+				arpint = ipadd[4]
+			if 'hp' in sshl3type:
+				arpmac = ipadd[1]
+				arpip = ipadd[0]
+				arpint = ipadd[3]
+			arpmac = arpmac.encode('ascii','ignore')
+			arpmac = arpmac.replace ('-','')
+			arpmac = arpmac.replace ('.','')
 			if macaddress == arpmac:
 				foundmatch = 'true'
 				break
+			else:
+				foundmatch = 'false'
 		if 'true' in foundmatch:
 			print 'Found match on L2 interface ' + macinterface + '. The IP address found was ' + arpip + ' in ' + arpint + '.'
 		else:
 			print 'No IP address found for MAC ' + macaddress + ' on interface ' + macinterface + ' in vlan' + macvlan + '.'
-			print 'Please validate that this is in the correct VLAN.'
 		foundmatch = 'false'
+print '---------------------------------------------------------'
+print 'Cleaning up'
+try:
+	os.remove('fsmmactemplate.fsm')
+except:
+	print 'Please manually remove the temporary file fsmmactemplate.fsm'
+try:
+	os.remove('fsmarptemplate.fsm')
+except:
+	print 'Please manually remove the temporary file fsmarptemplate.fsm'
+l2mactablefull = []
+l3arptablefull = []
 print '---------------------------------------------------------'
 print 'Script Complete'
