@@ -107,7 +107,6 @@ if "N" in sshl2l3q.upper():
 		print 'Incorrect input, please enter one of the compatible switch OS'
 		sys.exit()
 else:
-	print 'L2 and L3 are on the same switch'
 	sshl3ipq = sshl2ipq
 	sshl3userq = sshl2userq
 	sshl3password = sshl2password
@@ -276,10 +275,12 @@ else:
 print '---------------------------------------------------------'
 print 'Cleaning up'
 try:
+	fsmmactemplatefile.close()
 	os.remove('fsmmactemplate.fsm')
 except:
 	print 'Please manually remove the temporary file fsmmactemplate.fsm'
 try:
+	fsmarptemplatefile.close()
 	os.remove('fsmarptemplate.fsm')
 except:
 	print 'Please manually remove the temporary file fsmarptemplate.fsm'
