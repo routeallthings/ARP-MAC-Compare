@@ -167,7 +167,12 @@ for sshl2ip in sshl2ipq:
 		l2mactable = fsmmactemplate.ParseText(l2mactable)
 		if 'Y' in l2uplinkq.upper():
 			for mac in l2mactable:
-				macinterface = mac[3]
+				if 'cisco_ios' in sshl2type:
+					macinterface = mac[3]
+				if 'cisco_xe' in sshl2type:
+					macinterface = mac[3]
+				if 'cisco_nxos' in sshl2type:
+					macinterface = mac[6]
 				try:
 					l2macinttablefull.append(macinterface)
 				except NameError:
@@ -190,8 +195,12 @@ for sshl2ip in sshl2ipq:
 		if 'Y' in l2ignorevlanq.upper():	
 			l2mactablenew = []
 			for mac in l2mactable:
-				macinterface = mac[3]
-				macvlan = mac[2]
+				if 'cisco_ios' in sshl2type:
+					macvlan = mac[2]
+				if 'cisco_xe' in sshl2type:
+					macvlan = mac[2]
+				if 'cisco_nxos' in sshl2type:
+					macvlan = mac[0]
 				if not l2ignorevlan.count(macvlan) == 1:
 					l2mactablenew.append(mac)
 			l2mactable = l2mactablenew
@@ -267,10 +276,18 @@ if "Y" in saveresults.upper() or "YES" in saveresults.upper():
 		writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 		writer.writeheader()
 		for mac in l2mactablefull:
-			if 'cisco' in sshl2type:
+			if 'cisco_ios' in sshl2type:
 				macaddress = mac[0]
 				macvlan = mac[2]
 				macinterface = mac[3]
+			if 'cisco_xe' in sshl2type:
+				macaddress = mac[0]
+				macvlan = mac[2]
+				macinterface = mac[3]
+			if 'cisco_nxos' in sshl2type:
+				macaddress = mac[1]
+				macvlan = mac[0]
+				macinterface = mac[6]
 			if 'hp' in sshl2type:
 				macaddress = mac[0]
 				macvlan = mac[2]
@@ -279,10 +296,18 @@ if "Y" in saveresults.upper() or "YES" in saveresults.upper():
 			macaddress = macaddress.replace ('-','')
 			macaddress = macaddress.replace ('.','')
 			for ipadd in l3arptablefull:
-				if 'cisco' in sshl3type:
+				if 'cisco_ios' in sshl3type:
 					arpmac = ipadd[2]
 					arpip = ipadd[0]
 					arpint = ipadd[4]
+				if 'cisco_xe' in sshl3type:
+					arpmac = ipadd[2]
+					arpip = ipadd[0]
+					arpint = ipadd[4]
+				if 'cisco_nxos' in sshl3type:
+					arpmac = ipadd[2]
+					arpip = ipadd[0]
+					arpint = ipadd[3]
 				if 'hp' in sshl3type:
 					arpmac = ipadd[1]
 					arpip = ipadd[0]
@@ -305,10 +330,18 @@ if "Y" in saveresults.upper() or "YES" in saveresults.upper():
 		writer.writerow({'mac_add': 'Options: IgnoreInterfacesOver3MAC:[' + l2uplinkq.upper() + '] Options IgnoredVLANs:[' + l2ignorevlanq.upper() + ']'})
 else:
 	for mac in l2mactablefull:
-		if 'cisco' in sshl2type:
+		if 'cisco_ios' in sshl2type:
 			macaddress = mac[0]
 			macvlan = mac[2]
 			macinterface = mac[3]
+		if 'cisco_xe' in sshl2type:
+			macaddress = mac[0]
+			macvlan = mac[2]
+			macinterface = mac[3]
+		if 'cisco_nxos' in sshl2type:
+			macaddress = mac[1]
+			macvlan = mac[0]
+			macinterface = mac[6]
 		if 'hp' in sshl2type:
 			macaddress = mac[0]
 			macvlan = mac[2]
@@ -317,10 +350,18 @@ else:
 		macaddress = macaddress.replace ('-','')
 		macaddress = macaddress.replace ('.','')
 		for ipadd in l3arptablefull:
-			if 'cisco' in sshl3type:
+			if 'cisco_ios' in sshl3type:
 				arpmac = ipadd[2]
 				arpip = ipadd[0]
 				arpint = ipadd[4]
+			if 'cisco_xe' in sshl3type:
+				arpmac = ipadd[2]
+				arpip = ipadd[0]
+				arpint = ipadd[4]
+			if 'cisco_nxos' in sshl3type:
+				arpmac = ipadd[2]
+				arpip = ipadd[0]
+				arpint = ipadd[3]
 			if 'hp' in sshl3type:
 				arpmac = ipadd[1]
 				arpip = ipadd[0]
