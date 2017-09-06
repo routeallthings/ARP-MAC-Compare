@@ -88,6 +88,10 @@ if not re.match("hp",sshl2type) and not re.match("cisco",sshl2type):
 	sys.exit()
 sshl2l3q = raw_input ('Is the L3 boundary on the same switch? (Y/N): ')
 l2uplinkq = raw_input ('Do you want to ignore interfaces with more than 3 MAC addresses? (Y/N): ')
+l2ignorevlanq = raw_input ('Do you want to exempt specific VLANs from the lookup? (Y/N): ')
+if "Y" in l2ignorevlanq.upper():
+	l2ignorevlan = raw_input ('Exempted VLAN #s from the MAC lookup (separate by comma): ')
+	l2ignorevlan = l2ignorevlan.split(",")
 if "N" in sshl2l3q.upper():
 	print '----Questions for the L3 switch----'
 	sshl3ipq = raw_input ('Please enter the IP address of the L3 switch(s) (Separate by a comma): ')
@@ -183,6 +187,14 @@ for sshl2ip in sshl2ipq:
 					l2macintcountstr = str(l2macintcount)
 					'''print 'Interface ' + macinterfacename + ' has over ' + l2macintcountstr + ' mac addresses associated. Assuming uplink to another switch.'''
 			l2mactable = l2mactablenew
+		if 'Y' in l2ignorevlanq.upper():	
+			l2mactablenew = []
+			for mac in l2mactable:
+				macinterface = mac[3]
+				macvlan = mac[2]
+				if not l2ignorevlan.count(macvlan) == 1:
+					l2mactablenew.append(mac)
+			l2mactable = l2mactablenew
 	if 'hp' in sshl2type:
 		l2mactable = l2net_connect.send_command("show mac-address")
 		l2mactable = fsmmactemplate.ParseText(l2mactable)
@@ -208,6 +220,13 @@ for sshl2ip in sshl2ipq:
 					l2macintcountstr = str(l2macintcount)
 					'''print 'Interface ' + macinterfacename + ' has over ' + l2macintcountstr + ' mac addresses associated. Assuming uplink to another switch.'''
 			l2mactable = l2mactablenew
+		if 'Y' in l2ignorevlanq.upper():	
+			l2mactablenew = []
+			for mac in l2mactable:
+				macvlan = mac[2]
+				if not l2ignorevlan.count(macvlan) == 1:
+					l2mactablenew.append(mac)
+			l2mactable = l2mactablenew	
 	try:
 		l2mactablefull.extend(l2mactable)
 	except NameError:
@@ -283,6 +302,7 @@ if "Y" in saveresults.upper() or "YES" in saveresults.upper():
 				print 'No IP address found for MAC ' + macaddress + ' on interface ' + macinterface + ' in vlan' + macvlan + '.'
 				writer.writerow({'mac_add': macaddress, 'mac_vlan': macvlan, 'mac_int': macinterface})
 			foundmatch = 'false'
+		writer.writerow({'mac_add': 'Options: IgnoreInterfacesOver3MAC:[' + l2uplinkq.upper() + '] Options IgnoredVLANs:[' + l2ignorevlanq.upper() + ']'})
 else:
 	for mac in l2mactablefull:
 		if 'cisco' in sshl2type:
@@ -318,6 +338,8 @@ else:
 		else:
 			print 'No IP address found for MAC ' + macaddress + ' on interface ' + macinterface + ' in vlan' + macvlan + '.'
 		foundmatch = 'false'
+	print 'End of Lookup and Compare'
+	print 'Additional Options: IgnoreInterfacesOver3MAC:[' + l2uplinkq.upper() + '] Options IgnoredVLANs:[' + l2ignorevlanq.upper() + ']'
 print '---------------------------------------------------------'
 print 'Cleaning up'
 try:
