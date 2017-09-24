@@ -142,7 +142,7 @@ if "hp_procurve" in sshl3type:
 if "cisco_ios" in sshl3type or "cisco_xe" in sshl2type:
 	fsmarptemplate = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/cisco_ios_show_ip_arp.template"
 if "cisco_nxos" in sshl3type:
-	fsmarptemplate = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/cisco_nxos_show_ip_arp_detail.template"
+	fsmarptemplate = "https://raw.githubusercontent.com/routeallthings/ARP-MAC-Compare/master/cisco_nxos_show_ip_arp.template"
 urllib.urlretrieve(fsmarptemplate,'fsmarptemplate.fsm')
 fsmarptemplatefile = open("fsmarptemplate.fsm")
 fsmarptemplate = textfsm.TextFSM(fsmarptemplatefile)
