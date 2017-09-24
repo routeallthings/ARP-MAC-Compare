@@ -4,4 +4,4 @@ Value MAC (\S+)
 Value INTERFACE (\S+)
 
 Start
-^${ADDRESS}\s+${AGE}\s+${MAC}\s+${INTERFACE} -> Record
+  ^${ADDRESS}\s+${AGE}\s+${MAC}\s+${INTERFACE} -> Record
