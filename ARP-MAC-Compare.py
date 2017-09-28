@@ -127,8 +127,10 @@ if "hp_comware" in sshl2type:
 	fsmmactemplateurl = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/hp_comware_display_mac-address.template"
 if "hp_procurve" in sshl2type:
 	fsmmactemplateurl = "https://raw.githubusercontent.com/routeallthings/ARP-MAC-Compare/master/hp_procurve_show_mac_address.template"
-if "cisco_ios" in sshl2type or "cisco_xe" in sshl2type:
+if "cisco_ios" in sshl2type:
 	fsmmactemplateurl = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/cisco_ios_show_mac-address-table.template"
+if "cisco_xe" in sshl2type:
+	fsmmactemplateurl = "https://raw.githubusercontent.com/routeallthings/ARP-MAC-Compare/master/cisco_xe_show_mac_address.template"
 if "cisco_nxos" in sshl2type:
 	fsmmactemplateurl = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/cisco_nxos_show_mac_address-table.template"
 urllib.urlretrieve(fsmmactemplateurl,'fsmmactemplate.fsm')
