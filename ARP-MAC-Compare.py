@@ -163,7 +163,7 @@ for sshl2ip in sshl2ipq:
 	print 'Successfully connected to ' + l2devicehostname
 	print 'Getting MAC address table'
 	if 'cisco' in sshl2type:
-		l2mactable = l2net_connect.send_command("show mac address-table dynamic")
+		l2mactable = l2net_connect.send_command("show mac address-table | e CPU")
 		if 'Invalid input' in l2mactable:
 			l2mactable = l2net_connect.send_command("show mac-address-table")
 		l2mactable = fsmmactemplate.ParseText(l2mactable)
@@ -395,7 +395,7 @@ try:
 	os.remove('fsmarptemplate.fsm')
 except:
 	print 'Please manually remove the temporary file fsmarptemplate.fsm'
-l2mactablefull = []
-l3arptablefull = []
+'''l2mactablefull = []'''
+'''l3arptablefull = []'''
 print '---------------------------------------------------------'
 print 'Script Complete'
