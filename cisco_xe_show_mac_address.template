@@ -1,7 +1,10 @@
-Value Vlan (\d+)
-Value Mac (\S+)
-Value Type (\S+)
-Value Ports (\S+)
+Value DESTINATION_ADDRESS (\w+.\w+.\w+)
+Value TYPE (\w+)
+Value VLAN (\w+)
+Value DESTINATION_PORT (\S+)
 
 Start
-  ^${Vlan}\s+${Mac}\s+${Type}\s+${Ports} -> Record
+  ^Vlan\s+Mac Address\s+Type\s+Ports -> XE
+
+XE
+  ^\s+${VLAN}\s+${DESTINATION_ADDRESS}\s+${TYPE}\s+${DESTINATION_PORT} -> Record
