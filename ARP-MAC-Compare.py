@@ -92,6 +92,8 @@ l2ignorevlanq = raw_input ('Do you want to exempt specific VLANs from the lookup
 if "Y" in l2ignorevlanq.upper():
 	l2ignorevlan = raw_input ('Exempted VLAN #s from the MAC lookup (separate by comma): ')
 	l2ignorevlan = l2ignorevlan.split(",")
+if "cisco_xe" in sshl2type:
+	l2healthcheckq = raw_input ('Do you want to look for interface errors (Duplexing Issues)? (Y/N): ')
 if "N" in sshl2l3q.upper():
 	print '----Questions for the L3 switch----'
 	sshl3ipq = raw_input ('Please enter the IP address of the L3 switch(s) (Separate by a comma): ')
@@ -148,6 +150,12 @@ if "cisco_nxos" in sshl3type:
 urllib.urlretrieve(fsmarptemplate,'fsmarptemplate.fsm')
 fsmarptemplatefile = open("fsmarptemplate.fsm")
 fsmarptemplate = textfsm.TextFSM(fsmarptemplatefile)
+'''FSM section HealthCheck'''
+if "cisco_xe" in sshl2type and "Y" in l2healthcheckq.upper():
+	fsmhealthtemplateurl = "https://raw.githubusercontent.com/routeallthings/ARP-MAC-Compare/master/cisco_xe_show_interface_errors%20.template"
+	urllib.urlretrieve(fsmhealthtemplateurl,'fsmhealthtemplate.fsm')
+	fsmhealthtemplatefile = open("fsmhealthtemplate.fsm")
+	fsmhealthtemplate = textfsm.TextFSM(fsmhealthtemplatefile)
 '''Starting Script'''
 '''L2'''
 print '---------------------------------------------------------'
@@ -243,6 +251,14 @@ for sshl2ip in sshl2ipq:
 	except NameError:
 		l2mactablefull = []
 		l2mactablefull.extend(l2mactable)
+	if "Y" in l2healthcheckq.upper():
+		l2healthtable = l2net_connect.send_command("show interface counters errors")
+		l2healthtable = fsmhealthtemplate.ParseText(l2healthtable)
+		try:
+			l2healthtablefull.extend(l2healthtable)
+		except NameError:
+			l2healthtablefull = []
+			l2healthtablefull.extend(l2healthtable)
 	l2net_connect.disconnect()
 print '---------------------------------------------------------'
 '''L3'''
@@ -383,6 +399,19 @@ else:
 		foundmatch = 'false'
 	print 'End of Lookup and Compare'
 	print 'Additional Options: IgnoreInterfacesOver3MAC:[' + l2uplinkq.upper() + '] Options IgnoredVLANs:[' + l2ignorevlanq.upper() + ']'
+	if "Y" in l2healthcheckq.upper():
+		print '---------------------------------------------------------'
+		print 'Health Check Detected, starting Interface Health Check'
+		for l2health in l2healthtablefull:
+			if 'cisco_xe' in sshl2type:
+				l2healthport = l2health[0]
+				l2healtherror = l2health[2]
+			if l2healtherror > 0:
+				print 'Interface: ' + l2healthport + ' is showing CRC errors, please check duplexing settings'
+			else:
+				print 'Interface: ' + l2healthport + ' is showing NO ERRORS'
+		print 'Health Check Completed. If no interfaces are listed, no errors were found'
+		print 'If you believe that the interfaces listed have been corrected, please clear counters on those interfaces'
 print '---------------------------------------------------------'
 print 'Cleaning up'
 try:

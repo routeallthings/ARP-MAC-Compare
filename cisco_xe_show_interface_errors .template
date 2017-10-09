@@ -7,7 +7,7 @@ Value UNDERSIZE (\w+)
 Value OUTDISCARDS (\w+)
 
 Start
-  ^Port\s+Align-Err\s+FCS-Err\s+Xmit-Err\s+Rcv-Err\s+Undersize\s+OutDiscards -> XE
+  ^Port\s+Align-Err\s+FCS-Err\s+Xmit-Err\s+Rcv-Err\s+UnderSize\s+OutDiscards\s+ -> XE
 
 XE
-  ^${PORT}\s+${ALIGNERR}\s+${FCSERR}\s+${XMITERR}\s+${RCVERR}\s+${UNDERSIZE}\s+${OUTDISCARDS} -> Record
+  ^${PORT}\s+${ALIGNERR}\s+${FCSERR}\s+${XMITERR}\s+${RCVERR}\s+${UNDERSIZE}\s+${OUTDISCARDS}\s+ -> Record
