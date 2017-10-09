@@ -1,13 +1,13 @@
-Value PORTS (\S+)
+Value PORT (\S+)
 Value ALIGNERR (\w+)
 Value FCSERR (\w+)
 Value XMITERR (\w+)
 Value RCVERR (\w+)
-Value UNDERSIZED (\w+)
-Value OUTDISCARD (\w+)
+Value UNDERSIZE (\w+)
+Value OUTDISCARDS (\w+)
 
 Start
   ^Port\s+Align-Err\s+FCS-Err\s+Xmit-Err\s+Rcv-Err\s+Undersize\s+OutDiscards -> XE
 
 XE
-  ^\s+${PORTS}\s+${ALIGNERR}\s+${FCSERR}\s+${XMITERR}\s+${RCVERR}\s+${UNDERSIZED}\s+${OUTDISCARD} -> Record
+  ^${PORT}\s+${ALIGNERR}\s+${FCSERR}\s+${XMITERR}\s+${RCVERR}\s+${UNDERSIZE}\s+${OUTDISCARDS} -> Record
