@@ -1,0 +1,13 @@
+Value Port (\S+)
+Value Align-Err (\w+)
+Value FCS-Err (\w+)
+Value Xmit-Err (\w+)
+Value Rcv-Err (\w+)
+Value Undersize (\w+)
+Value OutDiscards (\w+)
+
+Start
+  ^Port\s+Align-Err\s+FCS-Err\s+Xmit-Err\s+Rcv-Err\s+Undersize\s+OutDiscards -> XE
+
+XE
+  ^\s+${Port}\s+${Align-Err}\s+${FCS-Err}\s+${Xmit-Err}\s+${Rcv-Err}\s+${Undersize}\s+${OutDiscards} -> Record
