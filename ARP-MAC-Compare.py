@@ -346,6 +346,22 @@ if "Y" in saveresults.upper() or "YES" in saveresults.upper():
 				writer.writerow({'mac_add': macaddress, 'mac_vlan': macvlan, 'mac_int': macinterface})
 			foundmatch = 'false'
 		writer.writerow({'mac_add': 'Options: IgnoreInterfacesOver3MAC:[' + l2uplinkq.upper() + '] Options IgnoredVLANs:[' + l2ignorevlanq.upper() + ']'})
+		if "Y" in l2healthcheckq.upper():
+			print '---------------------------------------------------------'
+			print 'Health Check Detected, starting Interface Health Check'
+			writer.writerow({'mac_add': 'Health Check Information'})
+			for l2health in l2healthtablefull:
+				if 'cisco_xe' in sshl2type:
+					l2healthport = l2health[0]
+					l2healtherror = l2health[2]
+					l2healtherrornumber = int(l2healtherror)
+				if l2healtherrornumber > 0:
+					print 'Interface: ' + l2healthport + ' is showing CRC errors, please check duplexing settings'
+				else:
+					print 'Interface: ' + l2healthport + ' is showing NO ERRORS'
+				writer.writerow({'mac_add': 'HealthCheck' , 'mac_vlan': 'CRC Errors: ' + l2healtherror , 'mac_int': l2healthport})
+			print 'Health Check Completed. If no interfaces are listed, no errors were found'
+			print 'If you believe that the interfaces listed have been corrected, please clear counters on those interfaces'
 else:
 	for mac in l2mactablefull:
 		if 'cisco_ios' in sshl2type:
@@ -406,7 +422,8 @@ else:
 			if 'cisco_xe' in sshl2type:
 				l2healthport = l2health[0]
 				l2healtherror = l2health[2]
-			if l2healtherror > 0:
+				l2healtherrornumber = int(l2healtherror)
+			if l2healtherrornumber > 0:
 				print 'Interface: ' + l2healthport + ' is showing CRC errors, please check duplexing settings'
 			else:
 				print 'Interface: ' + l2healthport + ' is showing NO ERRORS'
