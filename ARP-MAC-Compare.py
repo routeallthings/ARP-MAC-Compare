@@ -441,6 +441,11 @@ try:
 	os.remove('fsmarptemplate.fsm')
 except:
 	print 'Please manually remove the temporary file fsmarptemplate.fsm'
+try:
+	fsmhealthtemplatefile.close()
+	os.remove('fsmhealthtemplate.fsm')
+except:
+	print 'Please manually remove the temporary file fsmhealthtemplate.fsm'
 '''l2mactablefull = []'''
 '''l3arptablefull = []'''
 print '---------------------------------------------------------'
