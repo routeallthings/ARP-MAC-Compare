@@ -446,7 +446,8 @@ try:
 	os.remove('fsmhealthtemplate.fsm')
 except:
 	print 'Please manually remove the temporary file fsmhealthtemplate.fsm'
-'''l2mactablefull = []'''
-'''l3arptablefull = []'''
+for name in dir():
+	if not name.startswith('_'):
+		del globals()[name]
 print '---------------------------------------------------------'
 print 'Script Complete'
