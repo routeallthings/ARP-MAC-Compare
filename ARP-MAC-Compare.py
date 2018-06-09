@@ -29,7 +29,7 @@ try:
 	import netmiko
 	from netmiko import ConnectHandler
 except ImportError:
-	netmikoinstallstatus = fullpath = raw_input ('Netmiko module is missing, would you like to automatically install? (Y/N): ')
+	netmikoinstallstatus = raw_input ('Netmiko module is missing, would you like to automatically install? (Y/N): ')
 	if "Y" in netmikoinstallstatus.upper() or "YES" in netmikoinstallstatus.upper():
 		os.system('python -m pip install netmiko')
 		import netmiko
@@ -40,7 +40,7 @@ except ImportError:
 try:
 	import textfsm
 except ImportError:
-	textfsminstallstatus = fullpath = raw_input ('textfsm module is missing, would you like to automatically install? (Y/N): ')
+	textfsminstallstatus = raw_input ('textfsm module is missing, would you like to automatically install? (Y/N): ')
 	if "Y" in textfsminstallstatus.upper() or "YES" in textfsminstallstatus.upper():
 		os.system('python -m pip install textfsm')
 		import textfsm
@@ -50,7 +50,7 @@ except ImportError:
 try:
 	import urllib
 except ImportError:
-	urllibinstallstatus = fullpath = raw_input ('urllib module is missing, would you like to automatically install? (Y/N): ')
+	urllibinstallstatus = raw_input ('urllib module is missing, would you like to automatically install? (Y/N): ')
 	if "Y" in urllibinstallstatus.upper() or "YES" in urllibinstallstatus.upper():
 		os.system('python -m pip install urllib')
 		import urllib
@@ -94,6 +94,8 @@ if "Y" in l2ignorevlanq.upper():
 	l2ignorevlan = l2ignorevlan.split(",")
 if "cisco_xe" in sshl2type:
 	l2healthcheckq = raw_input ('Do you want to look for interface errors (Duplexing Issues)? (Y/N): ')
+else:
+	l2healthcheckq = 'N'
 if "N" in sshl2l3q.upper():
 	print '----Questions for the L3 switch----'
 	sshl3ipq = raw_input ('Please enter the IP address of the L3 switch(s) (Separate by a comma): ')
@@ -171,7 +173,7 @@ for sshl2ip in sshl2ipq:
 	print 'Successfully connected to ' + l2devicehostname
 	print 'Getting MAC address table'
 	if 'cisco' in sshl2type:
-		l2mactable = l2net_connect.send_command("show mac address-table | e CPU")
+		l2mactable = l2net_connect.send_command("show mac address-table | exclude CPU")
 		if 'Invalid input' in l2mactable:
 			l2mactable = l2net_connect.send_command("show mac-address-table")
 		l2mactable = fsmmactemplate.ParseText(l2mactable)
@@ -276,7 +278,7 @@ for sshl3ip in sshl3ipq:
 	if 'cisco' in sshl3type:
 		l3arptable = l3net_connect.send_command("show ip arp")
 		if 'Invalid input' in l3arptable:
-			l3net_connect.send_command("show arp")
+			l3arptable = l3net_connect.send_command("show arp")
 	if 'hp' in sshl3type:
 		l3arptable = l3net_connect.send_command("show arp")
 	l3arptable = fsmarptemplate.ParseText(l3arptable)
@@ -446,8 +448,9 @@ try:
 	os.remove('fsmhealthtemplate.fsm')
 except:
 	print 'Please manually remove the temporary file fsmhealthtemplate.fsm'
-for name in dir():
-	if not name.startswith('_'):
-		del globals()[name]
+
+###for name in dir():
+###	if not name.startswith('_'):
+###		del globals()[name]
 print '---------------------------------------------------------'
 print 'Script Complete'
