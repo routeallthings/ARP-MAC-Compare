@@ -145,7 +145,7 @@ if "hp_comware" in sshl3type:
 	fsmarptemplate = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/hp_comware_display_arp.template"
 if "hp_procurve" in sshl3type:
 	fsmarptemplate = "https://raw.githubusercontent.com/routeallthings/ARP-MAC-Compare/master/hp_procurve_show_arp.template"
-if "cisco_ios" in sshl3type or "cisco_xe" in sshl2type:
+if "cisco_ios" in sshl3type or "cisco_xe" in sshl3type:
 	fsmarptemplate = "https://raw.githubusercontent.com/networktocode/ntc-templates/master/templates/cisco_ios_show_ip_arp.template"
 if "cisco_nxos" in sshl3type:
 	fsmarptemplate = "https://raw.githubusercontent.com/routeallthings/ARP-MAC-Compare/master/cisco_nxos_show_ip_arp.template"
